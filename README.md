@@ -53,7 +53,7 @@ Build a supervised machine learning model that can:
 - Model achieves strong performance (91% weighted F1-score).
 - Majority class ("Walking") predicted well.
 - Minority classes handled using SMOTE and balanced class weights.
-- Feature importance shows `avg_mets`, `distance`, and `duration` are most predictive.
+- Feature importance shows `avg_mets`, `active_energy_kcal`, and `duration` are most predictive.
 ![Feature Importance](assets/RF_FeatureImp.png)
 ![Confusion Matrix](assets/RF_Confusion_Matrix.png)
 

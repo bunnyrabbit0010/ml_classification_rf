@@ -1,0 +1,3 @@
+duration_min,active_energy_kcal,basal_energy_kcal,distance_mi,is_indoor,avg_mets,weather_temp_f,weather_humidity_pct,start_timestamp_year,start_timestamp_month,start_timestamp_day,start_timestamp_hour,start_timestamp_minute,start_timestamp_weekday,end_timestamp_year,end_timestamp_month,end_timestamp_day,end_timestamp_hour,end_timestamp_minute,end_timestamp_weekday,has_distance,time_zone
+60,110,40,0.0,1,3.0,70,50,2025,6,7,7,0,6,2025,6,7,8,0,6,0,America/Los_Angeles
+90,200,30,4.5,0,2.5,68,60,2025,6,8,18,30,6,2025,6,8,20,0,1,1,America/Los_Angeles
