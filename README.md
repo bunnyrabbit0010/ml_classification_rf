@@ -54,7 +54,7 @@ Build a supervised machine learning model that can:
 - Majority class ("Walking") predicted well.
 - Minority classes handled using SMOTE and balanced class weights.
 - Feature importance shows `avg_mets`, `distance`, and `duration` are most predictive.
-![Feature Importance](assets/feature_importance.png)
+![Feature Importance](assets/RF_FeatureImp.png)
 
 ## 🔍 Next Steps
 
