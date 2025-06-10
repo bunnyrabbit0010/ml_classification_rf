@@ -1,0 +1,7 @@
+s3:
+  source_uri: s3://health-data-src/src-data.xml
+
+
+parse:
+  tag_name: Workout
+  attribute_name: workoutActivityType

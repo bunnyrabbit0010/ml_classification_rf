@@ -2,12 +2,12 @@ import joblib
 import pandas as pd
 
 # Load the model and encoders
-model = joblib.load('../train/models/model_with_smote.joblib')
-label_encoder = joblib.load('../preprocess/encoders/workout_type_encoder.pkl')
-time_zone_encoder = joblib.load('../preprocess/encoders/time_zone_encoder.pkl')
+model = joblib.load('model_with_smote.joblib')
+label_encoder = joblib.load('../data/encoders/workout_type_encoder.pkl')
+time_zone_encoder = joblib.load('../data/encoders/time_zone_encoder.pkl')
 
 # Load your input CSV file
-df = pd.read_csv("inference_inputs.csv")
+df = pd.read_csv("../data/inference_inputs.csv")
 
 # Encode time zone
 df['time_zone_encoded'] = time_zone_encoder.transform(df['time_zone'])
@@ -40,4 +40,4 @@ df['predicted_workout_type'] = predicted_labels
 
 # Save or print results
 print(df[['predicted_workout_type']])
-df.to_csv("inference_outputs.csv", index=False)
+

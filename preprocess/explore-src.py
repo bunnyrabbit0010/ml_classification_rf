@@ -1,45 +1,79 @@
-from collections import defaultdict
+import boto3
 import xml.etree.ElementTree as ET
+from collections import defaultdict
+import botocore
+import yaml
 
-def count_tag_attribute(xml_file_path, tag_name, attribute_name):
+def load_config(config_path='../config/s3_config.yml'):
+    try:
+        with open(config_path, 'r') as file:
+            config = yaml.safe_load(file)
+            print("Config loaded successfully.")
+            return config
+    except Exception as e:
+        print(f"Failed to load config file: {e}")
+        raise
+
+def parse_s3_uri(s3_uri):
+    try:
+        parts = s3_uri.split("/")
+        bucket = parts[2]
+        key = "/".join(parts[3:])
+        print(f"Parsed S3 URI - Bucket: {bucket}, Key: {key}")
+        return bucket, key
+    except Exception as e:
+        print(f"Error parsing S3 URI: {e}")
+        raise
+
+def count_tag_attribute_from_s3(s3_uri, tag_name, attribute_name):
+    s3 = boto3.client('s3')
+    bucket_name, key = parse_s3_uri(s3_uri)
+
+    try:
+        print(f"Fetching file from S3: s3://{bucket_name}/{key}")
+        s3_response = s3.get_object(Bucket=bucket_name, Key=key)
+        print("File fetched. Starting XML parsing...")
+    except botocore.exceptions.ClientError as e:
+        print(f"Error fetching file from S3: {e}")
+        raise
+
     counts = defaultdict(int)
-    print(f"Parsing XML for <{tag_name}> elements with attribute '{attribute_name}'...")
+    try:
+        context = ET.iterparse(s3_response['Body'], events=('start',))
+        for event, elem in context:
+            if elem.tag == tag_name:
+                attr_value = elem.attrib.get(attribute_name)
+                if attr_value:
+                    counts[attr_value] += 1
+            elem.clear()
 
-    context = ET.iterparse(xml_file_path, events=('start',))
-    for event, elem in context:
-        if elem.tag == tag_name:
-            attr_value = elem.attrib.get(attribute_name)
-            if attr_value:
-                counts[attr_value] += 1
-        elem.clear()
+        print("XML parsing completed.")
+    except ET.ParseError as e:
+        print(f"XML parsing error: {e}")
+        raise
+    except Exception as e:
+        print(f"Unexpected error during XML parsing: {e}")
+        raise
 
-    print("Finished parsing.")
     return dict(sorted(counts.items(), key=lambda x: x[1], reverse=True))
 
-print("Line 1...")
-with open("src-data.xml", "r", encoding="utf-8") as f:
-    print(f.readline())
 
-print("Exploring src-data.xml...")
-try:
-    tree = ET.parse("./src-data.xml")
-    root = tree.getroot()
-    print(f"Root tag: {root.tag}")
-except ET.ParseError as e:
-    print("Parse error:", e)
+# --- Main Script ---
+if __name__ == "__main__":
+    try:
+        config = load_config()
 
+        # Example: Count Workout types
+        print("\nCounting Workout Activity Types...")
+        workout_counts = count_tag_attribute_from_s3(
+            config['s3']['source_uri'],
+            tag_name=config['parse']['tag_name'],
+            attribute_name=config['parse']['attribute_name']
+        )
 
-# To get record types:
-record_type_counts = count_tag_attribute("src-data.xml", tag_name="Record", attribute_name="type")
+        print(" Workout Activity Type Counts:")
+        for k, v in workout_counts.items():
+            print(f"{k}: {v}")
 
-# To get workout activity types:
-workout_type_counts = count_tag_attribute("src-data.xml", tag_name="Workout", attribute_name="workoutActivityType")
-# Print results
-print("\n******************Record Type Counts:****")
-for record_type, count in record_type_counts.items():
-    print(f"{record_type}: {count}")
-
-
-print("\n******************Workout Activity Type Counts:***************")
-for workout_type, count in workout_type_counts.items():
-    print(f"{workout_type}: {count}")   
+    except Exception as e:
+        print(f"Script failed: {e}")
