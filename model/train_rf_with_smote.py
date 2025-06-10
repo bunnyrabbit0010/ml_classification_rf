@@ -5,6 +5,8 @@ from sklearn.metrics import classification_report, confusion_matrix
 from sklearn.preprocessing import LabelEncoder
 from imblearn.over_sampling import SMOTE
 import joblib
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 def train_rf_with_smote():
     # Step 1: Load cleaned workout data
@@ -72,8 +74,34 @@ def train_rf_with_smote():
     print("Confusion Matrix:")
     print(confusion_matrix(y_test, y_pred))
 
+
+    importances = model.feature_importances_
+    features = X_train.columns
+   
     # --- Save model and label encoder
     joblib.dump(model, "model_with_smote.joblib")
+
+    # Plot
+    plt.figure(figsize=(10, 6))
+    plt.barh(features, importances)
+    plt.xlabel("Feature Importance")
+    plt.title("Random Forest Feature Importances")
+    plt.tight_layout()
+    plt.show()
+    print("Done.")
+
+    print("\nEvaluating model performance on test set...")
+    y_pred = model.predict(X_test)
+    print(classification_report(y_test, y_pred))
+
+    # Confusion matrix
+    cm = confusion_matrix(y_test, y_pred, labels=model.classes_)
+    sns.heatmap(cm, annot=True, fmt='d', xticklabels=model.classes_, yticklabels=model.classes_)
+    plt.xlabel("Predicted")
+    plt.ylabel("Actual")
+    plt.title("Confusion Matrix")
+    plt.show()
+
 
 # --- Main Script ---
 if __name__ == "__main__":
